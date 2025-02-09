@@ -62,7 +62,7 @@ namespace MonoGame.Invisible
             
         }
 
-        public void BeginDraw(GameTime gameTime)
+        public void BeginDraw()
         {
             // Clear the GraphicsDevice with the transparent color key.
             _graphicsDevice.Clear(TransparentColor);

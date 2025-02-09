@@ -24,8 +24,7 @@ namespace MonoGame.Invisible
         /// <summary>
         /// Begins the drawing phase.
         /// </summary>
-        /// <param name="gameTime">Current game time.</param>
-        void BeginDraw(GameTime gameTime);
+        void BeginDraw();
 
         /// <summary>
         /// Ends the drawing phase.

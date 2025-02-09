@@ -81,12 +81,13 @@ namespace MonoGame.Invisible.Sample
 
         protected override void Draw(GameTime gameTime)
         {
-            _windowManager.BeginDraw(gameTime);
+            _windowManager.BeginDraw();
 
             spriteBatch.Begin();
             spriteBatch.Draw(_logo, _logoPosition, Color.White);
             spriteBatch.End();
 
+            // Not needed in ColorKey mode (could still stay here to keep the structure).
             _windowManager.EndDraw(gameTime);
         }
 

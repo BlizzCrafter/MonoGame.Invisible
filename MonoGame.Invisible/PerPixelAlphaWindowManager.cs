@@ -148,7 +148,7 @@ namespace MonoGame.Invisible
             }
         }
 
-        public void BeginDraw(GameTime gameTime)
+        public void BeginDraw()
         {
             // Render into the offscreen render target.
             _graphicsDevice.SetRenderTarget(_renderTarget);
