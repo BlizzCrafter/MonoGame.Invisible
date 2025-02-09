@@ -1,0 +1,21 @@
+<Project>
+	<PropertyGroup>
+		<id>MonoGame.Invisible</id>
+		<Version>$(MGInvisibleVersion)</Version>
+		<Authors>Marcel Härtel</Authors>
+		<Product>MonoGame.Invisible</Product>
+		<Description>Makes your MonoGame window transparent!</Description>
+		<PackageProjectUrl>https://github.com/BlizzCrafter/MonoGame.Invisible</PackageProjectUrl>
+		<RepositoryUrl>https://github.com/BlizzCrafter/MonoGame.Invisible.git</RepositoryUrl>
+		<PackageReadmeFile>README.md</PackageReadmeFile>
+		<PackageLicenseFile>LICENSE.txt</PackageLicenseFile>
+		<PackageIcon>Logo_x128.png</PackageIcon>
+		<PackageTags>MonoGame; Windows; Transparent; Invisible; Game</PackageTags>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<None Include="$(MSBuildThisFileDirectory)\README.md" Pack="true" PackagePath="\" />
+		<None Include="$(MSBuildThisFileDirectory)\LICENSE.txt" Pack="true" PackagePath="\" />
+		<None Include="$(MSBuildThisFileDirectory)\Logos\Logo_x128.png" Pack="true" PackagePath="\" />
+	</ItemGroup>
+</Project>
