@@ -27,7 +27,7 @@ protected override void Initialize()
 
 protected override void Draw(GameTime gameTime)
 {
-    _windowManager.BeginDraw(gameTime);
+    _windowManager.BeginDraw();
     spriteBatch.Begin();
     // Your Drawings here!
     spriteBatch.End();
