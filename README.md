@@ -1,4 +1,4 @@
-![Banner](https://github.com/BlizzCrafter/MonoGame.Invisible/master/Logos/Banner.png)
+![Banner](https://raw.githubusercontent.com/BlizzCrafter/MonoGame.Invisible/refs/heads/master/Logos/Banner.png)
 
 # Welcome to MonoGame.Invisible!
 [![Version](https://img.shields.io/nuget/v/MonoGame.Invisible?style=for-the-badge&logo=NuGet&logoColor=0289CC&logoSize=auto&label=MonoGame.Invisible&labelColor=262626&color=707070)](https://www.nuget.org/packages/MonoGo.Templates)
