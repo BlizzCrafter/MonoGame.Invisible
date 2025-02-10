@@ -35,12 +35,15 @@ protected override void Draw(GameTime gameTime)
 }
 ```
 
-Only works with a **MonoGame.Framework.WindowsDX** project!
-A **MonoGame.Framework.DesktopGL** project **doesn't work** - even if compiled for windows!
+> [!NOTE]
+> Only works with a **MonoGame.Framework.WindowsDX** project!
+> A **MonoGame.Framework.DesktopGL** project **doesn't work** - even if compiled for windows!
 
-Check out the integrated sample project, which shows the invisible MonoGame window in action.
-It's much smoother than in the video. You need to see it for yourself!
+> [!TIP]
+> Check out the **integrated sample project**, which shows the invisible MonoGame window in action.
+> It's much smoother than in the video. You need to see it for yourself!
 
 ### Now Have Fun with MonoGame.Invisible!
 
-PS: If you create such a Desktop-Game with MonoGame.Invisible, then please let me know. I will be happy to add a link to your game here on this site! :)
+> [!IMPORTANT] 
+> PS: If you create such a Desktop-Game with MonoGame.Invisible, then please let me know. This is not neccessary, but I would be happy to add a link to your game here on this site! :)
