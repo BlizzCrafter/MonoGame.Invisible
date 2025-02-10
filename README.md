@@ -35,7 +35,8 @@ protected override void Draw(GameTime gameTime)
 }
 ```
 
-Only the **Windows** platform is supported!
+Only works with a **MonoGame.Framework.WindowsDX** project!
+A **MonoGame.Framework.DesktopGL** project **doesn't work** - even if compiled for windows!
 
 Check out the integrated sample project, which shows the invisible MonoGame window in action.
 It's much smoother than in the video. You need to see it for yourself!
