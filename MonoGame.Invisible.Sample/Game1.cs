@@ -50,6 +50,12 @@ namespace MonoGame.Invisible.Sample
             // Initialize the TransparentWindowManager.
             _windowManager.Initialize();
 
+            // Send the window to the back.
+            //_windowManager.SendToBack();
+
+            // Bring the window to the front.
+            //_windowManager.BringToFront();
+
             _previousMouseState = Mouse.GetState();
             base.Initialize();
         }

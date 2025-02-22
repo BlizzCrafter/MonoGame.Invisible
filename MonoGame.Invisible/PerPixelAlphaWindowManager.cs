@@ -13,10 +13,10 @@ namespace MonoGame.Invisible
     /// </summary>
     public class PerPixelAlphaWindowManager : ITransparentWindowManager
     {
+        public nint WindowHandle { get; private set; }
         public Color TransparentColor { get; private set; } = Color.Transparent;
         public bool SwapRedBlueChannels { get; set; } = true;
 
-        private readonly nint _hWnd;
         private readonly GraphicsDevice _graphicsDevice;
         public RenderTarget2D _renderTarget;
 
@@ -44,7 +44,7 @@ namespace MonoGame.Invisible
 
         public PerPixelAlphaWindowManager(nint windowHandle, GraphicsDevice graphicsDevice, int width, int height)
         {
-            _hWnd = windowHandle;
+            WindowHandle = windowHandle;
             _graphicsDevice = graphicsDevice;
             _width = width;
             _height = height;
@@ -52,10 +52,10 @@ namespace MonoGame.Invisible
 
         public void Initialize()
         {
-            if (_hWnd == nint.Zero)
+            if (WindowHandle == nint.Zero)
                 throw new InvalidOperationException("Invalid window handle.");
 
-            int exStyle = Win32Helper.GetWindowLong(_hWnd, Win32Helper.GWL_EXSTYLE);
+            int exStyle = Win32Helper.GetWindowLong(WindowHandle, Win32Helper.GWL_EXSTYLE);
             if (exStyle == 0)
             {
                 int error = Marshal.GetLastWin32Error();
@@ -63,7 +63,7 @@ namespace MonoGame.Invisible
             }
 
             int newExStyle = exStyle | Win32Helper.WS_EX_LAYERED;
-            int setResult = Win32Helper.SetWindowLong(_hWnd, Win32Helper.GWL_EXSTYLE, newExStyle);
+            int setResult = Win32Helper.SetWindowLong(WindowHandle, Win32Helper.GWL_EXSTYLE, newExStyle);
             if (setResult == 0)
             {
                 int error = Marshal.GetLastWin32Error();
@@ -132,7 +132,7 @@ namespace MonoGame.Invisible
                     AlphaFormat = Win32Native.AC_SRC_ALPHA
                 };
 
-                bool result = Win32Native.UpdateLayeredWindow(_hWnd, screenDC, ref topPos, ref size,
+                bool result = Win32Native.UpdateLayeredWindow(WindowHandle, screenDC, ref topPos, ref size,
                     memDC, ref srcPos, 0, ref blend, Win32Native.ULW_ALPHA);
 
                 if (!result)

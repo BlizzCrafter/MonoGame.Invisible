@@ -11,24 +11,24 @@ namespace MonoGame.Invisible
     /// </summary>
     public class ColorKeyWindowManager : ITransparentWindowManager
     {
+        public nint WindowHandle { get; private set; }
         public Color TransparentColor { get; private set; }
 
-        private readonly nint _hWnd;
         private readonly GraphicsDevice _graphicsDevice;
 
         public ColorKeyWindowManager(nint windowHandle, GraphicsDevice graphicsDevice, Color transparentColor)
         {
-            _hWnd = windowHandle;
+            WindowHandle = windowHandle;
             _graphicsDevice = graphicsDevice;
             TransparentColor = transparentColor;
         }
 
         public void Initialize()
         {
-            if (_hWnd == nint.Zero)
+            if (WindowHandle == nint.Zero)
                 throw new InvalidOperationException("Invalid window handle.");
 
-            int exStyle = Win32Helper.GetWindowLong(_hWnd, Win32Helper.GWL_EXSTYLE);
+            int exStyle = Win32Helper.GetWindowLong(WindowHandle, Win32Helper.GWL_EXSTYLE);
             if (exStyle == 0)
             {
                 int error = Marshal.GetLastWin32Error();
@@ -36,7 +36,7 @@ namespace MonoGame.Invisible
             }
 
             int newExStyle = exStyle | Win32Helper.WS_EX_LAYERED;
-            int setResult = Win32Helper.SetWindowLong(_hWnd, Win32Helper.GWL_EXSTYLE, newExStyle);
+            int setResult = Win32Helper.SetWindowLong(WindowHandle, Win32Helper.GWL_EXSTYLE, newExStyle);
             if (setResult == 0)
             {
                 int error = Marshal.GetLastWin32Error();
@@ -46,7 +46,7 @@ namespace MonoGame.Invisible
             // Set the transparent color key for the window.
             uint colorKey = (uint)System.Drawing.ColorTranslator.ToWin32(
                 System.Drawing.Color.FromArgb(TransparentColor.R, TransparentColor.G, TransparentColor.B));
-            bool result = Win32Helper.SetLayeredWindowAttributes(_hWnd, colorKey, 0, Win32Helper.LWA_COLORKEY);
+            bool result = Win32Helper.SetLayeredWindowAttributes(WindowHandle, colorKey, 0, Win32Helper.LWA_COLORKEY);
             if (!result)
             {
                 int error = Marshal.GetLastWin32Error();
