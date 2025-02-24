@@ -20,8 +20,8 @@ namespace MonoGame.Invisible
         private const int HWND_NOTOPMOST = -2;
         private const int HWND_BOTTOM = 1;
 
-        private const uint GW_HWNDPREV = 3; // Fenster direkt davor (höher im Z-Order)
-        private const uint GW_HWNDNEXT = 2; // Fenster direkt danach (tiefer im Z-Order)
+        private const uint GW_HWNDPREV = 3;
+        private const uint GW_HWNDNEXT = 2;
 
         public const uint LWA_COLORKEY = 0x1;
         public const uint LWA_ALPHA = 0x2;
