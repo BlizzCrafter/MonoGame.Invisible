@@ -55,5 +55,13 @@ namespace MonoGame.Invisible
         {
             Win32Helper.SendToBack(WindowHandle);
         }
+
+        /// <summary>
+        /// Ensures the window remains in the background and cannot be brought to the foreground.
+        /// </summary>
+        void KeepInBackground()
+        {
+            Win32Helper.KeepInBackground(WindowHandle);
+        }
     }
 }

@@ -50,6 +50,9 @@ namespace MonoGame.Invisible.Sample
             // Initialize the TransparentWindowManager.
             _windowManager.Initialize();
 
+            // The window will stay in the background - even on user interaction.
+            _windowManager.KeepInBackground();
+
             // Send the window to the back.
             //_windowManager.SendToBack();
 

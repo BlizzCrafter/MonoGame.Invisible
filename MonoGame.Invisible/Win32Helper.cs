@@ -9,6 +9,7 @@ namespace MonoGame.Invisible
     {
         public const int GWL_EXSTYLE = -20;
         public const int WS_EX_LAYERED = 0x00080000;
+        public const int WS_EX_NOACTIVATE = 0x08000000;
 
         private const int SWP_NOSIZE = 0x0001;
         private const int SWP_NOMOVE = 0x0002;
@@ -41,6 +42,18 @@ namespace MonoGame.Invisible
         public static void SendToBack(nint hWnd)
         {
             SetWindowPos(hWnd, HWND_BOTTOM, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE | SWP_NOACTIVATE);
+        }
+
+        /// <summary>
+        /// Ensures the window remains in the background by applying the WS_EX_NOACTIVATE flag
+        /// and moving it to the back.
+        /// </summary>
+        /// <param name="hWnd">The handle of the window to keep in the background.</param>
+        public static void KeepInBackground(nint hWnd)
+        {
+            int exStyle = GetWindowLong(hWnd, GWL_EXSTYLE);
+            SetWindowLong(hWnd, GWL_EXSTYLE, exStyle | WS_EX_NOACTIVATE);
+            SendToBack(hWnd);
         }
     }
 
