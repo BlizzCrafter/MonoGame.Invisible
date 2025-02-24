@@ -61,8 +61,8 @@ namespace MonoGame.Invisible
                 int error = Marshal.GetLastWin32Error();
                 throw new InvalidOperationException("GetWindowLong failed. Error code: " + error);
             }
-
-            int newExStyle = exStyle | Win32Helper.WS_EX_LAYERED;
+            
+            int newExStyle = (exStyle & ~Win32Helper.WS_EX_APPWINDOW) | Win32Helper.WS_EX_LAYERED | Win32Helper.WS_EX_TOOLWINDOW | Win32Helper.WS_EX_NOACTIVATE;
             int setResult = Win32Helper.SetWindowLong(WindowHandle, Win32Helper.GWL_EXSTYLE, newExStyle);
             if (setResult == 0)
             {
@@ -115,25 +115,25 @@ namespace MonoGame.Invisible
                 Marshal.Copy(pixelInts, 0, bmpData.Scan0, pixelInts.Length);
                 bmp.UnlockBits(bmpData);
 
-                nint screenDC = NativeMethods.GetDC(nint.Zero);
-                nint memDC = NativeMethods.CreateCompatibleDC(screenDC);
+                nint screenDC = Win32Helper.GetDC(nint.Zero);
+                nint memDC = Win32Helper.CreateCompatibleDC(screenDC);
                 nint hBitmap = bmp.GetHbitmap(System.Drawing.Color.FromArgb(0));
-                nint oldBitmap = NativeMethods.SelectObject(memDC, hBitmap);
+                nint oldBitmap = Win32Helper.SelectObject(memDC, hBitmap);
 
-                Win32Native.POINT topPos = new Win32Native.POINT { x = 0, y = 0 };
-                Win32Native.SIZE size = new Win32Native.SIZE { cx = width, cy = height };
-                Win32Native.POINT srcPos = new Win32Native.POINT { x = 0, y = 0 };
+                Win32Helper.POINT topPos = new Win32Helper.POINT { x = 0, y = 0 };
+                Win32Helper.SIZE size = new Win32Helper.SIZE { cx = width, cy = height };
+                Win32Helper.POINT srcPos = new Win32Helper.POINT { x = 0, y = 0 };
 
-                Win32Native.BLENDFUNCTION blend = new Win32Native.BLENDFUNCTION
+                Win32Helper.BLENDFUNCTION blend = new Win32Helper.BLENDFUNCTION
                 {
-                    BlendOp = Win32Native.AC_SRC_OVER,
+                    BlendOp = Win32Helper.AC_SRC_OVER,
                     BlendFlags = 0,
                     SourceConstantAlpha = 255, // Global alpha is ignored; per-pixel alpha is used.
-                    AlphaFormat = Win32Native.AC_SRC_ALPHA
+                    AlphaFormat = Win32Helper.AC_SRC_ALPHA
                 };
 
-                bool result = Win32Native.UpdateLayeredWindow(WindowHandle, screenDC, ref topPos, ref size,
-                    memDC, ref srcPos, 0, ref blend, Win32Native.ULW_ALPHA);
+                bool result = Win32Helper.UpdateLayeredWindow(WindowHandle, screenDC, ref topPos, ref size,
+                    memDC, ref srcPos, 0, ref blend, Win32Helper.ULW_ALPHA);
 
                 if (!result)
                 {
@@ -141,10 +141,10 @@ namespace MonoGame.Invisible
                     System.Diagnostics.Debug.WriteLine("UpdateLayeredWindow failed. Error code: " + error);
                 }
 
-                NativeMethods.SelectObject(memDC, oldBitmap);
-                NativeMethods.DeleteObject(hBitmap);
-                NativeMethods.DeleteDC(memDC);
-                NativeMethods.ReleaseDC(nint.Zero, screenDC);
+                Win32Helper.SelectObject(memDC, oldBitmap);
+                Win32Helper.DeleteObject(hBitmap);
+                Win32Helper.DeleteDC(memDC);
+                Win32Helper.ReleaseDC(nint.Zero, screenDC);
             }
         }
 

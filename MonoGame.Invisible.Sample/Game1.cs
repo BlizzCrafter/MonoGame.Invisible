@@ -53,12 +53,6 @@ namespace MonoGame.Invisible.Sample
             // The window will stay in the background - even on user interaction.
             _windowManager.KeepInBackground();
 
-            // Send the window to the back.
-            //_windowManager.SendToBack();
-
-            // Bring the window to the front.
-            //_windowManager.BringToFront();
-
             _previousMouseState = Mouse.GetState();
             base.Initialize();
         }
@@ -84,6 +78,12 @@ namespace MonoGame.Invisible.Sample
 
             // Not needed in ColorKey mode.
             _windowManager.Update(gameTime);
+
+            // Ensure window stays in the back.
+            if (_windowManager.IsForegroundWindow()) 
+            {
+                _windowManager.SendToBack();
+            }
 
             base.Update(gameTime);
         }

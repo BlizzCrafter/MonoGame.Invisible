@@ -57,11 +57,38 @@ namespace MonoGame.Invisible
         }
 
         /// <summary>
-        /// Ensures the window remains in the background and cannot be brought to the foreground.
+        /// Keeps the window in the background, preventing it from being moved to the front.
         /// </summary>
         void KeepInBackground()
         {
             Win32Helper.KeepInBackground(WindowHandle);
+        }
+
+        /// <summary>
+        /// Checks if the window is the currently active (focused) window.
+        /// </summary>
+        /// <returns>True if the window is the foreground window; otherwise, false.</returns>
+        bool IsForegroundWindow()
+        {
+            return Win32Helper.IsForegroundWindow(WindowHandle);
+        }
+
+        /// <summary>
+        /// Checks if the window is in the background (behind other windows).
+        /// </summary>
+        /// <returns>True if the window is behind another window; otherwise, false.</returns>
+        bool IsInBackground()
+        {
+            return Win32Helper.IsInBackground(WindowHandle);
+        }
+
+        /// <summary>
+        /// Checks if the window is the topmost window on the screen.
+        /// </summary>
+        /// <returns>True if the window is the topmost; otherwise, false.</returns>
+        bool IsTopWindow()
+        {
+            return Win32Helper.IsTopWindow(WindowHandle);
         }
     }
 }

@@ -35,7 +35,7 @@ namespace MonoGame.Invisible
                 throw new InvalidOperationException("GetWindowLong failed. Error code: " + error);
             }
 
-            int newExStyle = exStyle | Win32Helper.WS_EX_LAYERED;
+            int newExStyle = (exStyle & ~Win32Helper.WS_EX_APPWINDOW) | Win32Helper.WS_EX_LAYERED | Win32Helper.WS_EX_TOOLWINDOW | Win32Helper.WS_EX_NOACTIVATE;
             int setResult = Win32Helper.SetWindowLong(WindowHandle, Win32Helper.GWL_EXSTYLE, newExStyle);
             if (setResult == 0)
             {

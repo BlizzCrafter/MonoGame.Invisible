@@ -9,7 +9,9 @@ namespace MonoGame.Invisible
     {
         public const int GWL_EXSTYLE = -20;
         public const int WS_EX_LAYERED = 0x00080000;
+        public const int WS_EX_TOOLWINDOW = 0x80;
         public const int WS_EX_NOACTIVATE = 0x08000000;
+        public const int WS_EX_APPWINDOW = 0x40000;
 
         private const int SWP_NOSIZE = 0x0001;
         private const int SWP_NOMOVE = 0x0002;
@@ -17,6 +19,9 @@ namespace MonoGame.Invisible
         private const int HWND_TOPMOST = -1;
         private const int HWND_NOTOPMOST = -2;
         private const int HWND_BOTTOM = 1;
+
+        private const uint GW_HWNDPREV = 3; // Fenster direkt davor (höher im Z-Order)
+        private const uint GW_HWNDNEXT = 2; // Fenster direkt danach (tiefer im Z-Order)
 
         public const uint LWA_COLORKEY = 0x1;
         public const uint LWA_ALPHA = 0x2;
@@ -33,35 +38,17 @@ namespace MonoGame.Invisible
         [DllImport("user32.dll", SetLastError = true)]
         private static extern bool SetWindowPos(nint hWnd, int hWndInsertAfter, int X, int Y, int cx, int cy, int uFlags);
 
-        public static void BringToFront(nint hWnd)
-        {
-            SetWindowPos(hWnd, HWND_TOPMOST, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE | SWP_NOACTIVATE);
-            SetWindowPos(hWnd, HWND_NOTOPMOST, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE | SWP_NOACTIVATE);
-        }
+        [DllImport("user32.dll")]
+        private static extern nint GetForegroundWindow();
 
-        public static void SendToBack(nint hWnd)
-        {
-            SetWindowPos(hWnd, HWND_BOTTOM, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE | SWP_NOACTIVATE);
-        }
+        [DllImport("user32.dll")]
+        private static extern nint GetWindow(nint hWnd, uint uCmd);
 
-        /// <summary>
-        /// Ensures the window remains in the background by applying the WS_EX_NOACTIVATE flag
-        /// and moving it to the back.
-        /// </summary>
-        /// <param name="hWnd">The handle of the window to keep in the background.</param>
-        public static void KeepInBackground(nint hWnd)
-        {
-            int exStyle = GetWindowLong(hWnd, GWL_EXSTYLE);
-            SetWindowLong(hWnd, GWL_EXSTYLE, exStyle | WS_EX_NOACTIVATE);
-            SendToBack(hWnd);
-        }
-    }
+        [DllImport("user32.dll")]
+        private static extern nint GetTopWindow(nint hWnd);
 
-    /// <summary>
-    /// Class containing P/Invoke definitions for UpdateLayeredWindow (used in Per-Pixel mode).
-    /// </summary>
-    internal static class Win32Native
-    {
+        #region P/Invoke definitions for UpdateLayeredWindow (used in Per-Pixel mode).
+
         [StructLayout(LayoutKind.Sequential)]
         public struct POINT
         {
@@ -90,17 +77,6 @@ namespace MonoGame.Invisible
         public const uint ULW_ALPHA = 0x02;
 
         [DllImport("user32.dll", SetLastError = true)]
-        public static extern bool UpdateLayeredWindow(nint hwnd, nint hdcDst,
-            ref POINT pptDst, ref SIZE psize, nint hdcSrc, ref POINT pptSrc,
-            int crKey, ref BLENDFUNCTION pblend, uint dwFlags);
-    }
-
-    /// <summary>
-    /// Native Methods for Per-Pixel Alpha
-    /// </summary>
-    internal static class NativeMethods
-    {
-        [DllImport("user32.dll", SetLastError = true)]
         public static extern nint GetDC(nint hWnd);
 
         [DllImport("user32.dll", SetLastError = true)]
@@ -117,5 +93,43 @@ namespace MonoGame.Invisible
 
         [DllImport("gdi32.dll", SetLastError = true)]
         public static extern bool DeleteObject(nint hObject);
+
+        [DllImport("user32.dll", SetLastError = true)]
+        public static extern bool UpdateLayeredWindow(nint hwnd, nint hdcDst,
+            ref POINT pptDst, ref SIZE psize, nint hdcSrc, ref POINT pptSrc,
+            int crKey, ref BLENDFUNCTION pblend, uint dwFlags);
+
+        #endregion
+
+        public static void BringToFront(nint hWnd)
+        {
+            SetWindowPos(hWnd, HWND_TOPMOST, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE | SWP_NOACTIVATE);
+            SetWindowPos(hWnd, HWND_NOTOPMOST, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE | SWP_NOACTIVATE);
+        }
+
+        public static void SendToBack(nint hWnd)
+        {
+            SetWindowPos(hWnd, HWND_BOTTOM, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE | SWP_NOACTIVATE);
+        }
+
+        public static void KeepInBackground(nint hWnd)
+        {
+            SetWindowPos(hWnd, HWND_BOTTOM, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE);
+        }
+
+        public static bool IsForegroundWindow(nint hWnd)
+        {
+            return GetForegroundWindow() == hWnd;
+        }
+
+        public static bool IsInBackground(nint hWnd)
+        {
+            return GetWindow(hWnd, GW_HWNDPREV) != nint.Zero;
+        }
+
+        public static bool IsTopWindow(nint hWnd)
+        {
+            return GetTopWindow(nint.Zero) == hWnd;
+        }
     }
 }
