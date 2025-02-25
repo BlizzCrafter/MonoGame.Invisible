@@ -117,6 +117,11 @@ namespace MonoGame.Invisible
             SetWindowPos(hWnd, HWND_BOTTOM, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE);
         }
 
+        public static void KeepInForeground(nint hWnd)
+        {
+            SetWindowPos(hWnd, HWND_TOPMOST, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE);
+        }
+
         public static bool IsForegroundWindow(nint hWnd)
         {
             return GetForegroundWindow() == hWnd;

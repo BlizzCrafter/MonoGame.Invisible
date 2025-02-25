@@ -65,6 +65,14 @@ namespace MonoGame.Invisible
         }
 
         /// <summary>
+        /// Keeps the window in the foreground, preventing it from being moved to the back.
+        /// </summary>
+        void KeepInForeground()
+        {
+            Win32Helper.KeepInForeground(WindowHandle);
+        }
+
+        /// <summary>
         /// Checks if the window is the currently active (focused) window.
         /// </summary>
         /// <returns>True if the window is the foreground window; otherwise, false.</returns>
