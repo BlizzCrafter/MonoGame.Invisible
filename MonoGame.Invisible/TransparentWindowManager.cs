@@ -1,4 +1,5 @@
 ﻿using Microsoft.Xna.Framework;
+using Color = Microsoft.Xna.Framework.Color;
 
 namespace MonoGame.Invisible
 {
@@ -7,6 +8,28 @@ namespace MonoGame.Invisible
     /// </summary>
     public static class TransparentWindowManager
     {
+        /// <summary>
+        /// The name of the application that will be used as the "Tray-Icon-Name" and "Registry-Key-Name" (Auto-Start / StartOnBoot).
+        /// </summary>
+        /// <remarks>
+        /// This name will be auto-set from the <c>GameWindow.Title</c> property, but can (and probably should!) be reset here manually (e.g. to avoid special characters in the registry key).
+        /// </remarks>
+        public static string AppName 
+        { 
+            get { return _appName; }
+            set
+            {
+                if (StartupManager.IsAutostartEnabled())
+                {
+                    StartupManager.SetAutostart(false);
+                    _appName = value;
+                    StartupManager.SetAutostart(true);
+                }
+                else _appName = value;
+            }
+        }
+        private static string _appName = "MonoGame.Invisible";
+
         private static bool _setupCalled = false;
         private static int _width;
         private static int _height;
@@ -55,6 +78,8 @@ namespace MonoGame.Invisible
             {
                 throw new InvalidOperationException("You need to setup the library first! Call: 'TransparentWindowManager.Setup()'");
             }
+
+            AppName = game.Window.Title;
 
             switch (mode)
             {

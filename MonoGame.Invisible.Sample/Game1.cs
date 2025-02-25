@@ -2,6 +2,14 @@
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using System;
+using System.Drawing;
+using System.Reflection;
+using System.Windows.Forms;
+using ButtonState = Microsoft.Xna.Framework.Input.ButtonState;
+using Color = Microsoft.Xna.Framework.Color;
+using Keys = Microsoft.Xna.Framework.Input.Keys;
+using Point = Microsoft.Xna.Framework.Point;
+using Rectangle = Microsoft.Xna.Framework.Rectangle;
 
 namespace MonoGame.Invisible.Sample
 {
@@ -24,6 +32,8 @@ namespace MonoGame.Invisible.Sample
 
         public Game1()
         {
+            Window.Title = "MonoGame Invisible Sample";
+
             graphics = new GraphicsDeviceManager(this);
             Content.RootDirectory = "Content";
 
@@ -53,6 +63,15 @@ namespace MonoGame.Invisible.Sample
             // The window will stay in the background - even on user interaction.
             _windowManager.KeepInBackground();
 
+            TrayIconManager.Init(
+                Icon.ExtractAssociatedIcon(Assembly.GetExecutingAssembly().Location));
+
+            var runOnBoot = new ToolStripMenuItem("Run On Boot", null, RunOnBoot) { Checked = StartupManager.IsAutostartEnabled() };
+            var exitItem = new ToolStripMenuItem("Exit", null, ExitApplication);
+
+            TrayIconManager.ContextMenu.Items.AddRange(
+                [runOnBoot, new ToolStripSeparator(), exitItem]);
+
             _previousMouseState = Mouse.GetState();
             base.Initialize();
         }
@@ -72,7 +91,7 @@ namespace MonoGame.Invisible.Sample
         protected override void Update(GameTime gameTime)
         {
             if (Keyboard.GetState().IsKeyDown(Keys.Escape))
-                Exit();
+                ExitApplication();
 
             HandleLogoDragging();
 
@@ -98,6 +117,30 @@ namespace MonoGame.Invisible.Sample
 
             // Not needed in ColorKey mode (could still stay here to keep the structure).
             _windowManager.EndDraw(gameTime);
+        }
+
+        private void RunOnBoot(object? sender, EventArgs e)
+        {
+            if (sender is ToolStripMenuItem item)
+            {
+                item.Checked = !item.Checked;
+
+                if (item.Checked) StartupManager.SetAutostart(true);
+                else StartupManager.SetAutostart(false);
+            }
+        }
+
+        private void ExitApplication(object? sender, EventArgs e)
+        {
+            ExitApplication();
+        }
+
+        private void ExitApplication()
+        {
+            TrayIconManager.Dispose();
+
+            Exit();
+            Application.Exit();
         }
 
         /// <summary>

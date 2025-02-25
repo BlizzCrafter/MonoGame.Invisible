@@ -7,6 +7,7 @@
 	<OutputPath>..\bin\</OutputPath>
 	<GenerateDocumentationFile>True</GenerateDocumentationFile>
 	<DocumentationFile></DocumentationFile>
+	<UseWindowsForms>true</UseWindowsForms>
   </PropertyGroup>
 
   <ItemGroup>

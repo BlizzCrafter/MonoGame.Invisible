@@ -1,6 +1,7 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using System.Runtime.InteropServices;
+using Color = Microsoft.Xna.Framework.Color;
 
 namespace MonoGame.Invisible
 {
