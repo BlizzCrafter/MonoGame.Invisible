@@ -21,13 +21,18 @@ namespace MonoGame.Invisible.Sample
         // Example texture (e.g. a logo)
         Texture2D _logo;
 
-        // Logo position and dragging variables
+        // Render target for global alpha checking.
+        RenderTarget2D _sceneRenderTarget;
+        // Array to hold render target pixel data.
+        Color[] _sceneData;
+
+        // Logo position and dragging variables.
         Vector2 _logoPosition;
         bool _isDragging = false;
         Vector2 _dragOffset;
         MouseState _previousMouseState;
 
-        // The transparent window manager (depending on the mode)
+        // The transparent window manager.
         ITransparentWindowManager _windowManager;
 
         public Game1()
@@ -86,6 +91,10 @@ namespace MonoGame.Invisible.Sample
             _logoPosition = new Vector2(
                 (graphics.PreferredBackBufferWidth / 2) - (_logo.Width / 2),
                 (graphics.PreferredBackBufferHeight / 2) - (_logo.Height / 2));
+
+            // Create a render target matching the window size.
+            _sceneRenderTarget = new RenderTarget2D(GraphicsDevice, graphics.PreferredBackBufferWidth, graphics.PreferredBackBufferHeight);
+            _sceneData = new Color[graphics.PreferredBackBufferWidth * graphics.PreferredBackBufferHeight];
         }
 
         protected override void Update(GameTime gameTime)
@@ -95,11 +104,11 @@ namespace MonoGame.Invisible.Sample
 
             HandleLogoDragging();
 
-            // Not needed in ColorKey mode.
+            // Update the transparent window manager.
             _windowManager.Update(gameTime);
 
             // Ensure window stays in the back.
-            if (_windowManager.IsForegroundWindow()) 
+            if (_windowManager.IsForegroundWindow())
             {
                 _windowManager.SendToBack();
             }
@@ -110,13 +119,19 @@ namespace MonoGame.Invisible.Sample
         protected override void Draw(GameTime gameTime)
         {
             _windowManager.BeginDraw();
+            DrawScene();
+            _windowManager.EndDraw(gameTime);
+        }
 
+        /// <summary>
+        /// Draws the current scene.
+        /// This method is used in both the Draw() method and for updating the alpha data.
+        /// </summary>
+        private void DrawScene()
+        {
             spriteBatch.Begin();
             spriteBatch.Draw(_logo, _logoPosition, Color.White);
             spriteBatch.End();
-
-            // Not needed in ColorKey mode (could still stay here to keep the structure).
-            _windowManager.EndDraw(gameTime);
         }
 
         private void RunOnBoot(object? sender, EventArgs e)
@@ -124,9 +139,10 @@ namespace MonoGame.Invisible.Sample
             if (sender is ToolStripMenuItem item)
             {
                 item.Checked = !item.Checked;
-
-                if (item.Checked) StartupManager.SetAutostart(true);
-                else StartupManager.SetAutostart(false);
+                if (item.Checked)
+                    StartupManager.SetAutostart(true);
+                else
+                    StartupManager.SetAutostart(false);
             }
         }
 
@@ -138,48 +154,79 @@ namespace MonoGame.Invisible.Sample
         private void ExitApplication()
         {
             TrayIconManager.Dispose();
-
             Exit();
             Application.Exit();
         }
 
         /// <summary>
         /// Handles the dragging logic for the logo texture.
+        /// Dragging is only activated when the initial click is on an opaque part of the current scene.
         /// </summary>
         private void HandleLogoDragging()
         {
             MouseState currentMouseState = Mouse.GetState();
             Point mousePoint = currentMouseState.Position;
-
-            // Define a rectangle representing the logo's area.
             Rectangle logoRect = new Rectangle(_logoPosition.ToPoint(), new Point(_logo.Width, _logo.Height));
 
-            // Check if the left button is pressed.
-            if (currentMouseState.LeftButton == ButtonState.Pressed)
+            // Check if the left button transitioned from released to pressed.
+            if (currentMouseState.LeftButton == ButtonState.Pressed &&
+                _previousMouseState.LeftButton == ButtonState.Released)
             {
-                if (!_isDragging)
+                // Update the alpha data using the current drawing from DrawScene.
+                UpdateAlphaData();
+
+                // Start dragging only if the click is within the logo and the pixel is opaque.
+                if (logoRect.Contains(mousePoint) && IsGlobalPixelOpaque(mousePoint))
                 {
-                    // If we are not already dragging, check if the mouse is over the logo.
-                    if (logoRect.Contains(mousePoint))
-                    {
-                        _isDragging = true;
-                        // Record the offset from the top-left corner of the logo to the mouse cursor.
-                        _dragOffset = new Vector2(mousePoint.X, mousePoint.Y) - _logoPosition;
-                    }
+                    _isDragging = true;
+                    _dragOffset = new Vector2(mousePoint.X, mousePoint.Y) - _logoPosition;
                 }
                 else
                 {
-                    // If dragging, update the logo position based on the current mouse position and offset.
-                    _logoPosition = new Vector2(mousePoint.X, mousePoint.Y) - _dragOffset;
+                    _isDragging = false;
                 }
             }
-            else
+
+            if (currentMouseState.LeftButton == ButtonState.Pressed && _isDragging)
             {
-                // When the left button is released, stop dragging.
+                _logoPosition = new Vector2(mousePoint.X, mousePoint.Y) - _dragOffset;
+            }
+            else if (currentMouseState.LeftButton == ButtonState.Released)
+            {
                 _isDragging = false;
             }
 
             _previousMouseState = currentMouseState;
+        }
+
+        /// <summary>
+        /// Returns true if the pixel in the render target at the given mouse position is opaque.
+        /// </summary>
+        /// <param name="mousePoint">The mouse position in window coordinates.</param>
+        /// <returns>True if the pixel’s alpha is at least 128; otherwise, false.</returns>
+        private bool IsGlobalPixelOpaque(Point mousePoint)
+        {
+            if (mousePoint.X < 0 || mousePoint.Y < 0 ||
+                mousePoint.X >= _sceneRenderTarget.Width || mousePoint.Y >= _sceneRenderTarget.Height)
+                return false;
+
+            int index = mousePoint.Y * _sceneRenderTarget.Width + mousePoint.X;
+            Color pixelColor = _sceneData[index];
+
+            return pixelColor.A >= 128;
+        }
+
+        /// <summary>
+        /// Updates the render target with the current scene drawing and retrieves its pixel data.
+        /// This is called only on an initial mouse click, so that the drawing is always current.
+        /// </summary>
+        private void UpdateAlphaData()
+        {
+            GraphicsDevice.SetRenderTarget(_sceneRenderTarget);
+            GraphicsDevice.Clear(Color.Transparent);
+            DrawScene();
+            GraphicsDevice.SetRenderTarget(null);
+            _sceneRenderTarget.GetData(_sceneData);
         }
     }
 }
