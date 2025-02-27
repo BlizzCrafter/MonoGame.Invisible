@@ -18,22 +18,55 @@ Creating an invisible MonoGame window with this library is as easy as:
 ```c#
 protected override void Initialize()
 {
-    TransparentWindowManager.Setup(this, graphics);
-    _windowManager = TransparentWindowManager.Create(this, TransparencyMode.ColorKey, new Color(1, 1, 1));
-    _windowManager.Initialize();
+    // Setup the TransparentWindowManager
+    TransparentWindowManager.Init(this, graphics);
 
     base.Initialize();
 }
 
 protected override void Draw(GameTime gameTime)
 {
-    _windowManager.BeginDraw();
+    TransparentWindowManager.Window.PrepareDraw();
+
     spriteBatch.Begin();
     // Your Drawings here!
     spriteBatch.End();
-    _windowManager.EndDraw(gameTime);
 }
 ```
+
+EASY! 😎
+
+### Some Helpful Features:
+```c#
+protected override void Initialize()
+{
+    // The window will stay in the background - even on user interaction.
+    TransparentWindowManager.Window.KeepInBackground();
+
+    // Keeps the window in the foreground, preventing it from being moved to the back.
+    TransparentWindowManager.Window.KeepInForeground();
+}
+
+protected override void Update(GameTime gameTime)
+{
+    // Ensure window stays in the back.
+    if (TransparentWindowManager.Window.IsForegroundWindow())
+    {
+        TransparentWindowManager.Window.SendToBack();
+    }
+
+    if (TransparentWindowManager.Window.IsPixelOpaque(mousePoint))
+    {
+        // The pixel under the mouse cursor is opaque!
+    }
+    else
+    {
+        // The pixel under the mouse cursor is transparent!
+    }
+}
+```
+
+More helpful stuff and feaures inside! 🔎
 
 > [!NOTE]
 > Only works with a **MonoGame.Framework.WindowsDX** project!
@@ -43,7 +76,7 @@ protected override void Draw(GameTime gameTime)
 > Check out the **integrated sample project**, which shows the invisible MonoGame window in action.
 > It's much smoother than in the video. You need to see it for yourself!
 
-### Now Have Fun with MonoGame.Invisible!
+### 💖 Now Have Fun with MonoGame.Invisible! 🕸️
 
 > [!IMPORTANT] 
 > PS: If you create such a Desktop-Game with MonoGame.Invisible, then please let me know. This is not neccessary, but I would be happy to add a link to your game here on this site! :)
