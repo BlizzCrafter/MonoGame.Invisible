@@ -3,6 +3,9 @@ using System.Reflection;
 
 namespace MonoGame.Invisible
 {
+    /// <summary>
+    /// Manages the startup settings for the application.
+    /// </summary>
     public static class StartupManager
     {
         // The auto-start registry key path.
@@ -11,6 +14,7 @@ namespace MonoGame.Invisible
         /// <summary>
         /// Enables or disables autostart for the application.
         /// </summary>
+        /// <param name="enable">True to enable autostart, false to disable.</param>
         public static void SetAutostart(bool enable)
         {
             using var key = Registry.CurrentUser.OpenSubKey(RegistryKeyPath, true);
@@ -32,6 +36,7 @@ namespace MonoGame.Invisible
         /// <summary>
         /// Checks if autostart is enabled.
         /// </summary>
+        /// <returns>True if autostart is enabled, otherwise false.</returns>
         public static bool IsAutostartEnabled()
         {
             using var key = Registry.CurrentUser.OpenSubKey(RegistryKeyPath, false);

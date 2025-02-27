@@ -21,19 +21,11 @@ namespace MonoGame.Invisible.Sample
         // Example texture (e.g. a logo)
         Texture2D _logo;
 
-        // Render target for global alpha checking.
-        RenderTarget2D _sceneRenderTarget;
-        // Array to hold render target pixel data.
-        Color[] _sceneData;
-
         // Logo position and dragging variables.
         Vector2 _logoPosition;
         bool _isDragging = false;
         Vector2 _dragOffset;
         MouseState _previousMouseState;
-
-        // The transparent window manager.
-        ITransparentWindowManager _windowManager;
 
         public Game1()
         {
@@ -50,23 +42,10 @@ namespace MonoGame.Invisible.Sample
         protected override void Initialize()
         {
             // Setup the TransparentWindowManager.
-            TransparentWindowManager.Setup(this, graphics);
-
-            // Choose the desired transparency mode:
-            // Option 1: ColorKey mode (e.g. using 'Magenta' as the transparent color)
-            // Fast, prefered and recommended way of making your MonoGame window transparent!
-            _windowManager = TransparentWindowManager.Create(this, TransparencyMode.ColorKey, new Color(1, 1, 1));
-
-            // Option 2: Per-Pixel Alpha mode
-            // Slow and NOT the prefered way of making your MonoGame window transparent!
-            // Use it for tinkering or if the ColorKey version does not satisfy you.
-            //_windowManager = TransparentWindowManager.Create(this, TransparencyMode.PerPixelAlpha);
-
-            // Initialize the TransparentWindowManager.
-            _windowManager.Initialize();
+            TransparentWindowManager.Init(this, graphics);
 
             // The window will stay in the background - even on user interaction.
-            _windowManager.KeepInBackground();
+            TransparentWindowManager.Window.KeepInBackground();
 
             TrayIconManager.Init(
                 Icon.ExtractAssociatedIcon(Assembly.GetExecutingAssembly().Location));
@@ -91,10 +70,6 @@ namespace MonoGame.Invisible.Sample
             _logoPosition = new Vector2(
                 (graphics.PreferredBackBufferWidth / 2) - (_logo.Width / 2),
                 (graphics.PreferredBackBufferHeight / 2) - (_logo.Height / 2));
-
-            // Create a render target matching the window size.
-            _sceneRenderTarget = new RenderTarget2D(GraphicsDevice, graphics.PreferredBackBufferWidth, graphics.PreferredBackBufferHeight);
-            _sceneData = new Color[graphics.PreferredBackBufferWidth * graphics.PreferredBackBufferHeight];
         }
 
         protected override void Update(GameTime gameTime)
@@ -104,13 +79,10 @@ namespace MonoGame.Invisible.Sample
 
             HandleLogoDragging();
 
-            // Update the transparent window manager.
-            _windowManager.Update(gameTime);
-
             // Ensure window stays in the back.
-            if (_windowManager.IsForegroundWindow())
+            if (TransparentWindowManager.Window.IsForegroundWindow())
             {
-                _windowManager.SendToBack();
+                TransparentWindowManager.Window.SendToBack();
             }
 
             base.Update(gameTime);
@@ -118,17 +90,8 @@ namespace MonoGame.Invisible.Sample
 
         protected override void Draw(GameTime gameTime)
         {
-            _windowManager.BeginDraw();
-            DrawScene();
-            _windowManager.EndDraw(gameTime);
-        }
+            TransparentWindowManager.Window.PrepareDraw();
 
-        /// <summary>
-        /// Draws the current scene.
-        /// This method is used in both the Draw() method and for updating the alpha data.
-        /// </summary>
-        private void DrawScene()
-        {
             spriteBatch.Begin();
             spriteBatch.Draw(_logo, _logoPosition, Color.White);
             spriteBatch.End();
@@ -172,11 +135,8 @@ namespace MonoGame.Invisible.Sample
             if (currentMouseState.LeftButton == ButtonState.Pressed &&
                 _previousMouseState.LeftButton == ButtonState.Released)
             {
-                // Update the alpha data using the current drawing from DrawScene.
-                UpdateAlphaData();
-
                 // Start dragging only if the click is within the logo and the pixel is opaque.
-                if (logoRect.Contains(mousePoint) && IsGlobalPixelOpaque(mousePoint))
+                if (logoRect.Contains(mousePoint) && TransparentWindowManager.Window.IsPixelOpaque(mousePoint))
                 {
                     _isDragging = true;
                     _dragOffset = new Vector2(mousePoint.X, mousePoint.Y) - _logoPosition;
@@ -197,36 +157,6 @@ namespace MonoGame.Invisible.Sample
             }
 
             _previousMouseState = currentMouseState;
-        }
-
-        /// <summary>
-        /// Returns true if the pixel in the render target at the given mouse position is opaque.
-        /// </summary>
-        /// <param name="mousePoint">The mouse position in window coordinates.</param>
-        /// <returns>True if the pixel’s alpha is at least 128; otherwise, false.</returns>
-        private bool IsGlobalPixelOpaque(Point mousePoint)
-        {
-            if (mousePoint.X < 0 || mousePoint.Y < 0 ||
-                mousePoint.X >= _sceneRenderTarget.Width || mousePoint.Y >= _sceneRenderTarget.Height)
-                return false;
-
-            int index = mousePoint.Y * _sceneRenderTarget.Width + mousePoint.X;
-            Color pixelColor = _sceneData[index];
-
-            return pixelColor.A >= 128;
-        }
-
-        /// <summary>
-        /// Updates the render target with the current scene drawing and retrieves its pixel data.
-        /// This is called only on an initial mouse click, so that the drawing is always current.
-        /// </summary>
-        private void UpdateAlphaData()
-        {
-            GraphicsDevice.SetRenderTarget(_sceneRenderTarget);
-            GraphicsDevice.Clear(Color.Transparent);
-            DrawScene();
-            GraphicsDevice.SetRenderTarget(null);
-            _sceneRenderTarget.GetData(_sceneData);
         }
     }
 }

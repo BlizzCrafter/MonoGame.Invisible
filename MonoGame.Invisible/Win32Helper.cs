@@ -101,37 +101,61 @@ namespace MonoGame.Invisible
 
         #endregion
 
+        /// <summary>
+        /// Brings the window to the front of the Z-order, making it the topmost window.
+        /// </summary>
         public static void BringToFront(nint hWnd)
         {
             SetWindowPos(hWnd, HWND_TOPMOST, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE | SWP_NOACTIVATE);
             SetWindowPos(hWnd, HWND_NOTOPMOST, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE | SWP_NOACTIVATE);
         }
 
+        /// <summary>
+        /// Sends the window to the back of the Z-order, behind other windows.
+        /// </summary>
         public static void SendToBack(nint hWnd)
         {
             SetWindowPos(hWnd, HWND_BOTTOM, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE | SWP_NOACTIVATE);
         }
 
+        /// <summary>
+        /// Keeps the window in the background, preventing it from being moved to the front.
+        /// </summary>
         public static void KeepInBackground(nint hWnd)
         {
             SetWindowPos(hWnd, HWND_BOTTOM, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE);
         }
 
+        /// <summary>
+        /// Keeps the window in the foreground, preventing it from being moved to the back.
+        /// </summary>
         public static void KeepInForeground(nint hWnd)
         {
             SetWindowPos(hWnd, HWND_TOPMOST, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE);
         }
 
+        /// <summary>
+        /// Checks if the window is the currently active (focused) window.
+        /// </summary>
+        /// <returns>True if the window is the foreground window; otherwise, false.</returns>
         public static bool IsForegroundWindow(nint hWnd)
         {
             return GetForegroundWindow() == hWnd;
         }
 
+        /// <summary>
+        /// Checks if the window is in the background (behind other windows).
+        /// </summary>
+        /// <returns>True if the window is behind another window; otherwise, false.</returns>
         public static bool IsInBackground(nint hWnd)
         {
             return GetWindow(hWnd, GW_HWNDPREV) != nint.Zero;
         }
 
+        /// <summary>
+        /// Checks if the window is the topmost window on the screen.
+        /// </summary>
+        /// <returns>True if the window is the topmost; otherwise, false.</returns>
         public static bool IsTopWindow(nint hWnd)
         {
             return GetTopWindow(nint.Zero) == hWnd;

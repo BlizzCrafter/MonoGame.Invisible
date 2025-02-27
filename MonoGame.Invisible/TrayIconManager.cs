@@ -1,11 +1,18 @@
 ﻿namespace MonoGame.Invisible
 {
+    /// <summary>
+    /// Manages the tray icon for the application.
+    /// </summary>
     public static class TrayIconManager
     {
         public static NotifyIcon TrayIcon { get; private set; }
 
         public static ContextMenuStrip ContextMenu => TrayIcon.ContextMenuStrip!;
 
+        /// <summary>
+        /// Initializes the tray icon with the specified icon.
+        /// </summary>
+        /// <param name="icon">The icon to use for the tray icon.</param>
         public static void Init(Icon? icon = default)
         {
             TrayIcon = new NotifyIcon
@@ -27,6 +34,9 @@
             }
         }
 
+        /// <summary>
+        /// Disposes the tray icon.
+        /// </summary>
         public static void Dispose()
         {
             TrayIcon.Visible = false;
