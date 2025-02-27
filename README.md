@@ -66,7 +66,7 @@ protected override void Update(GameTime gameTime)
 }
 ```
 
-More helpful stuff and feaures inside! 🔎
+More helpful stuff and features inside! 🔎
 
 > [!NOTE]
 > Only works with a **MonoGame.Framework.WindowsDX** project!
