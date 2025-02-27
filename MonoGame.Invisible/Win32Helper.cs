@@ -3,7 +3,7 @@
 namespace MonoGame.Invisible
 {
     /// <summary>
-    /// Helper class for basic Win32 calls needed for both modes.
+    /// Helper class for basic Win32 calls.
     /// </summary>
     internal static class Win32Helper
     {
@@ -46,61 +46,7 @@ namespace MonoGame.Invisible
 
         [DllImport("user32.dll")]
         private static extern nint GetTopWindow(nint hWnd);
-
-        #region P/Invoke definitions for UpdateLayeredWindow (used in Per-Pixel mode).
-
-        [StructLayout(LayoutKind.Sequential)]
-        public struct POINT
-        {
-            public int x;
-            public int y;
-        }
-
-        [StructLayout(LayoutKind.Sequential)]
-        public struct SIZE
-        {
-            public int cx;
-            public int cy;
-        }
-
-        [StructLayout(LayoutKind.Sequential, Pack = 1)]
-        public struct BLENDFUNCTION
-        {
-            public byte BlendOp;
-            public byte BlendFlags;
-            public byte SourceConstantAlpha;
-            public byte AlphaFormat;
-        }
-
-        public const byte AC_SRC_OVER = 0x00;
-        public const byte AC_SRC_ALPHA = 0x01;
-        public const uint ULW_ALPHA = 0x02;
-
-        [DllImport("user32.dll", SetLastError = true)]
-        public static extern nint GetDC(nint hWnd);
-
-        [DllImport("user32.dll", SetLastError = true)]
-        public static extern int ReleaseDC(nint hWnd, nint hDC);
-
-        [DllImport("gdi32.dll", SetLastError = true)]
-        public static extern nint CreateCompatibleDC(nint hdc);
-
-        [DllImport("gdi32.dll", SetLastError = true)]
-        public static extern bool DeleteDC(nint hdc);
-
-        [DllImport("gdi32.dll", SetLastError = true)]
-        public static extern nint SelectObject(nint hdc, nint hgdiobj);
-
-        [DllImport("gdi32.dll", SetLastError = true)]
-        public static extern bool DeleteObject(nint hObject);
-
-        [DllImport("user32.dll", SetLastError = true)]
-        public static extern bool UpdateLayeredWindow(nint hwnd, nint hdcDst,
-            ref POINT pptDst, ref SIZE psize, nint hdcSrc, ref POINT pptSrc,
-            int crKey, ref BLENDFUNCTION pblend, uint dwFlags);
-
-        #endregion
-
+        
         /// <summary>
         /// Brings the window to the front of the Z-order, making it the topmost window.
         /// </summary>
