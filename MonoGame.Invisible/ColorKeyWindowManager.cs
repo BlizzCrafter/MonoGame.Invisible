@@ -133,6 +133,14 @@ namespace MonoGame.Invisible
         }
 
         /// <summary>
+        /// Forces the window to stay in the foreground.
+        /// </summary>
+        public void ForceForeground()
+        {
+            Win32Helper.ForceForeground(WindowHandle);
+        }
+
+        /// <summary>
         /// Checks if the window is the currently active (focused) window.
         /// </summary>
         /// <returns>True if the window is the foreground window; otherwise, false.</returns>

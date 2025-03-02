@@ -46,7 +46,13 @@ namespace MonoGame.Invisible
 
         [DllImport("user32.dll")]
         private static extern nint GetTopWindow(nint hWnd);
-        
+
+        [DllImport("user32.dll")]
+        private static extern bool ShowWindow(nint hWnd, int nCmdShow);
+
+        [DllImport("user32.dll")]
+        private static extern bool SetForegroundWindow(nint hWnd);
+
         /// <summary>
         /// Brings the window to the front of the Z-order, making it the topmost window.
         /// </summary>
@@ -78,6 +84,14 @@ namespace MonoGame.Invisible
         public static void KeepInForeground(nint hWnd)
         {
             SetWindowPos(hWnd, HWND_TOPMOST, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE);
+        }
+
+        /// <summary>
+        /// Forces the window to become the foreground window.
+        /// </summary>
+        public static void ForceForeground(nint hWnd)
+        {
+            SetForegroundWindow(hWnd);
         }
 
         /// <summary>
